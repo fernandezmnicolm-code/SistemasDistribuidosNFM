@@ -12,3 +12,5 @@ target/
 *.rar
 hs_err_pid*
 replay_pid*
+build/
+dist/
