@@ -1,0 +1,12 @@
+com\mycompany\clienteturista\ClienteTurista.class
+com\mycompany\clienteturista\Pago.class
+com\mycompany\clienteturista\Operador.class
+com\mycompany\clienteturista\ServerMigracion.class
+com\mycompany\clienteturista\ServidorBanco.class
+com\mycompany\clienteturista\IOperador.class
+com\mycompany\clienteturista\Voucher.class
+com\mycompany\clienteturista\Banco.class
+com\mycompany\clienteturista\ServidorOperadora.class
+com\mycompany\clienteturista\ServidorAntifraude.class
+com\mycompany\clienteturista\IBanco.class
+com\mycompany\clienteturista\IServidor.class
