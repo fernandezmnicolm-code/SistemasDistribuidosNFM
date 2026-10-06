@@ -131,67 +131,39 @@ public class NodoPuerta implements Receiver {
     }
 
 
-    public void procesarSolicitud(
-            Message msg,
-            MensajeroAforo mensaje) {
+    public void procesarSolicitud(Message msg,MensajeroAforo mensaje) {
 
-        // Verificamos si ESTE nodo
-        // es el coordinador
         if (!canal.getAddress().equals(canal.getView().getCoord())) {
 
             return;
         }
 
-
         int nuevaOcupacion = ocupacionActual + mensaje.getPersonas();
-
 
         try {
 
             if (nuevaOcupacion <= aforoMaximo) {
-
 
                 MensajeroAforo aceptado = new MensajeroAforo(
                                 MensajeroAforo.Tipo.ACEPTADO,
                                 mensaje.getPuerta(),
                                 mensaje.getPersonas()
                         );
-
-
-                // null significa:
-                // enviar a TODOS
+                
                 canal.send(new ObjectMessage( null, aceptado)
                 );
-
-
+                
             } else {
 
-
-                MensajeAforo rechazado =
-                        new MensajeAforo(
-                                MensajeAforo.Tipo.RECHAZADO,
+                MensajeroAforo rechazado = new MensajeroAforo(MensajeroAforo.Tipo.RECHAZADO,
                                 mensaje.getPuerta(),
                                 mensaje.getPersonas()
                         );
-
-
-                // Solo responde
-                // a la puerta solicitante
-                canal.send(
-                        new ObjectMessage(
-                                msg.getSrc(),
-                                rechazado
-                        )
-                );
+                canal.send(new ObjectMessage( msg.getSrc(), rechazado));
             }
-
-
         } catch (Exception e) {
 
-            System.out.println(
-                    "Error: "
-                    + e.getMessage()
-            );
+            System.out.println( "Error: " + e.getMessage());
         }
     }
 
@@ -200,36 +172,15 @@ public class NodoPuerta implements Receiver {
 
         try {
 
-            Address coordinador =
-                    canal
-                    .getView()
-                    .getCoord();
+            Address coordinador = canal.getView().getCoord();
 
+            MensajeroAforo solicitud = new MensajeroAforo(MensajeroAforo.Tipo.SOLICITUD,nombre,personas);
 
-            MensajeAforo solicitud =
-                    new MensajeAforo(
-                            MensajeAforo.Tipo.SOLICITUD,
-                            nombre,
-                            personas
-                    );
-
-
-            // UNICAST:
-            // solamente al coordinador
-            canal.send(
-                    new ObjectMessage(
-                            coordinador,
-                            solicitud
-                    )
-            );
-
+            canal.send(new ObjectMessage(coordinador,solicitud));
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "Error: "
-                    + e.getMessage()
-            );
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -237,196 +188,95 @@ public class NodoPuerta implements Receiver {
     public void salir(int personas) {
 
         try {
+            MensajeroAforo salida = new MensajeroAforo(MensajeroAforo.Tipo.SALIDA,nombre,personas);
 
-            MensajeAforo salida =
-                    new MensajeAforo(
-                            MensajeAforo.Tipo.SALIDA,
-                            nombre,
-                            personas
-                    );
-
-
-            // MULTICAST:
-            // null = todos
-            canal.send(
-                    new ObjectMessage(
-                            null,
-                            salida
-                    )
-            );
-
+            canal.send(new ObjectMessage(null, salida));
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "Error: "
-                    + e.getMessage()
-            );
+            System.out.println("Error: " + e.getMessage() );
         }
     }
 
 
     public void mostrarEstado() {
 
-        System.out.println(
-                "Ocupacion: "
-                + ocupacionActual
-                + "/"
-                + aforoMaximo
-        );
+        System.out.println("Ocupacion: " + ocupacionActual + "/" + aforoMaximo);
 
+        if (ocupacionActual == aforoMaximo) {
 
-        if (ocupacionActual
-                == aforoMaximo) {
-
-            System.out.println(
-                    "AFORO COMPLETO"
-            );
+            System.out.println("AFORO COMPLETO");
         }
     }
 
 
     public void menu() {
 
-        Scanner teclado =
-                new Scanner(System.in);
-
+        Scanner teclado = new Scanner(System.in);
 
         while (true) {
 
             System.out.print("> ");
 
-            String linea =
-                    teclado.nextLine();
+            String linea = teclado.nextLine();
 
+            String[] partes = linea.split(" ");
 
-            String[] partes =
-                    linea.split(" ");
+            if (partes[0].equalsIgnoreCase( "/entrar")) {
 
-
-            if (partes[0]
-                    .equalsIgnoreCase(
-                            "/entrar")) {
-
-
-                int personas =
-                        Integer.parseInt(
-                                partes[1]
-                        );
-
+                int personas = Integer.parseInt(partes[1]);
 
                 entrar(personas);
 
+            } else if (partes[0].equalsIgnoreCase("/salir")) {
 
-            } else if (partes[0]
-                    .equalsIgnoreCase(
-                            "/salir")) {
-
-
-                int personas =
-                        Integer.parseInt(
-                                partes[1]
-                        );
-
-
+                int personas = Integer.parseInt( partes[1]);
                 salir(personas);
 
-
-            } else if (partes[0]
-                    .equalsIgnoreCase(
-                            "/estado")) {
-
-
-                mostrarEstado();
-
+            } else if (partes[0].equalsIgnoreCase("/estado")) {
+            mostrarEstado();
 
             } else {
-
-                System.out.println(
-                        "Comando no reconocido"
-                );
+                System.out.println("Comando no reconocido");
             }
         }
     }
 
 
     @Override
-    public void getState(
-            OutputStream salida)
-            throws Exception {
+    public void getState(OutputStream salida) throws Exception {
 
-
-        DataOutputStream datos =
-                new DataOutputStream(
-                        salida
-                );
-
-
-        datos.writeInt(
-                ocupacionActual
-        );
-
-
-        System.out.println(
-                "Enviando estado: "
-                + ocupacionActual
-        );
+        DataOutputStream datos = new DataOutputStream(salida);
+        
+        datos.writeInt(ocupacionActual);
+        
+        System.out.println("Enviando estado: " + ocupacionActual);
     }
 
 
     @Override
-    public void setState(
-            InputStream entrada)
-            throws Exception {
+    public void setState(InputStream entrada)throws Exception {
 
+        DataInputStream datos =new DataInputStream(entrada);
 
-        DataInputStream datos =
-                new DataInputStream(
-                        entrada
-                );
+        ocupacionActual =datos.readInt();
 
-
-        ocupacionActual =
-                datos.readInt();
-
-
-        System.out.println(
-                "Estado recibido: "
-                + ocupacionActual
-        );
+        System.out.println("Estado recibido: " + ocupacionActual);
     }
 
 
-    public static void main(String[] args)
-            throws Exception {
-
+    public static void main(String[] args) throws Exception {
 
         if (args.length < 2) {
-
-            System.out.println(
-                    "Uso: java NodoPuerta "
-                    + "<nombre> <aforoMaximo>"
-            );
-
+            System.out.println("Uso: java NodoPuerta " + "<nombre> <aforoMaximo>");
             return;
         }
 
+        String nombre = args[0];
 
-        String nombre =
-                args[0];
+        int aforoMaximo = Integer.parseInt(args[1]);
 
-
-        int aforoMaximo =
-                Integer.parseInt(
-                        args[1]
-                );
-
-
-        NodoPuerta nodo =
-                new NodoPuerta(
-                        nombre,
-                        aforoMaximo
-                );
+        NodoPuerta nodo = new NodoPuerta(nombre,aforoMaximo);
 
 
         nodo.iniciar();
