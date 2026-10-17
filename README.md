@@ -1,5 +1,5 @@
 # SistemasDistribuidosNFM
-# Sistemas Distribuidos - Práctica 1
+# Sistemas Distribuidos 
 
 **Estudiante:** Nicol Milena Fernandez Menacho
 **CU:** 111-520
