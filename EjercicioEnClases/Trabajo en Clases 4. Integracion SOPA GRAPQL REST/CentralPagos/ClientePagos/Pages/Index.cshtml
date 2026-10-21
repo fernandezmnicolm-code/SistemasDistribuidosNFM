@@ -1,0 +1,186 @@
+﻿@page
+@model ClientePagos.Pages.IndexModel
+
+@{
+    ViewData["Title"] = "Central de Pagos";
+}
+
+<div class="container mt-4">
+
+    <h1>Central de Pagos</h1>
+
+    <p>
+        Consulta y pago de facturas CESSA y ELAPAS
+    </p>
+
+    <hr />
+
+    <form method="post" asp-page-handler="Consultar">
+
+        <div class="mb-3">
+            <label class="form-label">
+                CI
+            </label>
+
+            <input
+                asp-for="CI"
+                class="form-control"
+                required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Nombres
+            </label>
+
+            <input
+                asp-for="Nombres"
+                class="form-control"
+                required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Primer Apellido
+            </label>
+
+            <input
+                asp-for="PrimerApellido"
+                class="form-control"
+                required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                Segundo Apellido
+            </label>
+
+            <input
+                asp-for="SegundoApellido"
+                class="form-control"
+                required />
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary">
+            Consultar deudas
+        </button>
+
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Mensaje))
+    {
+        <div class="alert alert-info mt-4">
+            @Model.Mensaje
+        </div>
+    }
+
+    @if (Model.Deudas.Count > 0)
+    {
+        <hr />
+
+        <h2>Deudas pendientes</h2>
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-striped">
+
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Factura</th>
+                        <th>Año</th>
+                        <th>Mes</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var deuda in Model.Deudas)
+                    {
+                        <tr>
+
+                            <td>
+                                @deuda.Empresa
+                            </td>
+
+                            <td>
+                                @deuda.NumeroFactura
+                            </td>
+
+                            <td>
+                                @deuda.Anio
+                            </td>
+
+                            <td>
+                                @deuda.Mes
+                            </td>
+
+                            <td>
+                                @deuda.TotalFactura.ToString("0.00") Bs
+                            </td>
+
+                            <td>
+                                @deuda.Estado
+                            </td>
+
+                            <td>
+
+                                <form
+                                    method="post"
+                                    asp-page-handler="Pagar">
+
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="@deuda.Id" />
+
+                                    <input
+                                        type="hidden"
+                                        name="empresa"
+                                        value="@deuda.Empresa" />
+
+                                    <input
+                                        type="hidden"
+                                        asp-for="CI" />
+
+                                    <input
+                                        type="hidden"
+                                        asp-for="Nombres" />
+
+                                    <input
+                                        type="hidden"
+                                        asp-for="PrimerApellido" />
+
+                                    <input
+                                        type="hidden"
+                                        asp-for="SegundoApellido" />
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-success"
+                                        onclick="return confirm('¿Desea pagar esta factura?');">
+
+                                        Pagar
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</div>
