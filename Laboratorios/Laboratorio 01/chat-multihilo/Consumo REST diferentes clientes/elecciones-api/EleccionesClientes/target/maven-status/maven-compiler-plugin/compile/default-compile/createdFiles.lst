@@ -1,0 +1,8 @@
+service\UsuarioService.class
+ui\LoginFrame.class
+service\AuthService.class
+com\sis258\eleccionesclientes\EleccionesClientes.class
+model\Usuario.class
+ui\UsuariosFrame.class
+ui\UsuariosFrame$1.class
+service\Api.class
